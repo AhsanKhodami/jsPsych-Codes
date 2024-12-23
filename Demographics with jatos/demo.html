@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demographics Form</title>
+  <script src="jatos.js"></script>
+  <script src="core/jspsych.js"></script>
+  <script src="core/plugin-html-button-response.js"></script>
+  <link href="core/jspsych.css" rel="stylesheet" type="text/css"/>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f3e7e9, #e3eeff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .demographics-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      justify-content: center;
+      width: 90%;
+      max-width: 600px;
+      background: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .demographics-form h2 {
+      color: #4a4a4a;
+      font-size: 22px;
+      grid-column: span 2;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .demographics-form label {
+      font-size: 14px;
+      color: #4a4a4a;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    .required {
+      color: red;
+      margin-left: 5px;
+    }
+
+    .info-icon {
+      margin-left: 5px;
+      cursor: pointer;
+      color: #007bff;
+      font-size: 16px;
+    }
+
+    .info-icon:hover::after {
+      content: attr(data-info);
+      position: absolute;
+      background: #f9f9f9;
+      color: #333;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      white-space: nowrap;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-top: -35px;
+      margin-left: -10px;
+    }
+
+    .demographics-form input, 
+    .demographics-form select {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #d0d0d0;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+
+    .demographics-form input:focus, 
+    .demographics-form select:focus {
+      outline: none;
+      border: 1px solid #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      grid-column: span 2;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .demographics-form button {
+      background: linear-gradient(90deg, #007bff, #0056b3);
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .demographics-form button:hover {
+      background: linear-gradient(90deg, #0056b3, #003f8b);
+    }
+
+    .popup-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 20;
+      text-align: center;
+    }
+
+    .popup-container button {
+      margin-top: 20px;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="popup-container" class="popup-container">
+    <p id="popup-message"></p>
+    <button onclick="closePopup('continue')">Continue</button>
+    <button onclick="closePopup('decline')">Decline</button>
+  </div>
+
+  <div id="demographics-container">
+    <div class="demographics-form">
+      <h2>Demographics Form</h2>
+      <label for="name">Name<span class="info-icon" data-info="You can provide initials, e.g., JD for John Doe.">ℹ</span></label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="gender">Gender<span class="required">*</span></label>
+      <select id="gender" name="gender" required>
+        <option value="" disabled selected>Select your gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="age">Age<span class="required">*</span></label>
+      <input type="number" id="age" name="age" min="0" required>
+
+      <label for="handiness">Handiness<span class="required">*</span></label>
+      <select id="handiness" name="handiness" required>
+        <option value="" disabled selected>Select your handiness</option>
+        <option value="left">Left-handed</option>
+        <option value="right">Right-handed</option>
+        <option value="ambidextrous">Ambidextrous</option>
+      </select>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email">
+
+      <label for="telephone">Telephone</label>
+      <input type="tel" id="telephone" name="telephone">
+
+      <label for="participate" class="full-width">Willingness to participate further<span class="required">*</span></label>
+      <select id="participate" name="participate" class="full-width" required>
+        <option value="" disabled selected>Yes or No</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+
+      <div id="email-consent-container" class="full-width hidden">
+        <input type="checkbox" id="email-consent-checkbox" name="email-consent">
+        <label for="email-consent-checkbox">Use my email address to contact me</label>
+      </div>
+
+      <div class="full-width">
+        <input type="checkbox" id="data-consent" name="data-consent" required>
+        <label for="data-consent">I agree to the data privacy policy</label>
+      </div>
+
+      <div class="button-group">
+        <button type="button" onclick="openPopup('By agreeing, you consent to data collection and usage as outlined. Click confirm to proceed.')">View Policy</button>
+        <button type="button" onclick="validateForm()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function validateForm() {
+      const formElements = document.querySelectorAll('.demographics-form input, .demographics-form select');
+      let formData = {};
+      let valid = true;
+
+      formElements.forEach(element => {
+        if (element.required && !element.value) {
+          valid = false;
+          element.style.border = '1px solid red';
+        } else {
+          element.style.border = '';
+          formData[element.name] = element.value;
+        }
+      });
+
+      if (!document.getElementById('data-consent').checked) {
+        alert('You must agree to the data privacy policy.');
+        valid = false;
+      }
+
+      if (valid) {
+        jatos.submitResultData(formData, () => {
+          jatos.endStudyAndRedirect('next.html');
+        });
+      }
+    }
+
+    document.addEventListener('change', function (event) {
+      if (event.target.id === 'participate') {
+        const emailConsent = document.getElementById('email-consent-container');
+        if (event.target.value === 'yes') {
+          emailConsent.classList.remove('hidden');
+        } else {
+          emailConsent.classList.add('hidden');
+        }
+      }
+    });
+
+    function openPopup(message) {
+      const popup = document.getElementById('popup-container');
+      document.getElementById('popup-message').innerText = message;
+      popup.style.display = 'block';
+    }
+
+    function closePopup(action) {
+      const popup = document.getElementById('popup-container');
+      popup.style.display = 'none';
+      if (action === 'decline') {
+        document.body.innerHTML = '<h2>Thank you for your time. Please close this page.</h2>';
+      }
+    }
+  </script>
+</body>
+</html>
